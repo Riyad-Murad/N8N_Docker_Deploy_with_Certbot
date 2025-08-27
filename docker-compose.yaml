@@ -1,0 +1,45 @@
+services:
+  n8n:
+    image: n8nio/n8n
+    restart: always
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=12345678
+      - N8N_HOST=n8n-6ixrams.zapto.org
+      - WEBHOOK_URL=https://n8n-6ixrams.zapto.org/
+      - N8N_SECURE_COOKIE=true
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - n8n-network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates
+      - ./nginx/startup.sh:/docker-entrypoint.d/startup.sh
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    depends_on:
+      - n8n
+    networks:
+      - n8n-network
+    entrypoint: ["/bin/sh", "/docker-entrypoint.d/startup.sh"]
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    entrypoint: /bin/sh -c "sleep 10 && certbot certonly --webroot -w /var/www/certbot --agree-tos --no-eff-email --email mahditalal789@gmail.com -d n8n-6ixrams.zapto.org --noninteractive && docker exec nginx nginx -s reload"
+
+volumes:
+  n8n_data:
+
+networks:
+  n8n-network:
