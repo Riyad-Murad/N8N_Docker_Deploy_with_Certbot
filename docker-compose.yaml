@@ -5,7 +5,7 @@ services:
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=admin
-      - N8N_BASIC_AUTH_PASSWORD=12345678
+      - N8N_BASIC_AUTH_PASSWORD=[password]
       - N8N_HOST=n8n-6ixrams.zapto.org
       - WEBHOOK_URL=https://n8n-6ixrams.zapto.org/
       - N8N_SECURE_COOKIE=true
